@@ -2,197 +2,270 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Portal - Attendance</title>
-    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* --- MODERN VARIABLES --- */
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --primary: #3b82f6;        
-            --success: #10b981;        
-            --warning: #f59e0b;
-            --danger: #ef4444;         
-            --text-light: #f8fafc;
-            --text-gray: #94a3b8;
+            --bg-body: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --primary: #6366f1;   /* Indigo */
+            --accent: #8b5cf6;    /* Violet */
+            
+            /* Status Colors */
+            --present: #10b981;   /* Emerald */
+            --present-bg: rgba(16, 185, 129, 0.15);
+            
+            --permission: #f59e0b; /* Amber */
+            --permission-bg: rgba(245, 158, 11, 0.15);
+            
+            --absent: #ef4444;    /* Rose */
+            --absent-bg: rgba(239, 68, 68, 0.15);
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Poppins', 'Battambang', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-light);
+            font-family: 'Outfit', 'Battambang', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
+            padding-bottom: 100px; /* Space for bottom bar */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
-        /* Header & Date Picker */
-        header { 
-            width: 90%; max-width: 800px;
-            margin-top: 30px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+        /* --- STICKY HEADER --- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
         }
 
-        h1 { margin: 0; font-size: 1.8rem; background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-content {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand p { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+
+        .date-group {
+            position: relative;
+        }
 
         .date-picker {
-            background: #334155;
-            color: white;
-            border: 1px solid #475569;
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
             padding: 10px 15px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-family: inherit;
+            font-size: 0.95rem;
             outline: none;
             cursor: pointer;
+            transition: 0.3s;
         }
+        
+        .date-picker:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
 
-        /* Student List Container */
-        .attendance-list {
-            width: 90%;
+        /* --- STUDENT LIST --- */
+        .container {
+            width: 100%;
             max-width: 800px;
-            margin: 30px 0 100px 0; /* Space for fixed button */
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
         }
 
-        /* Individual Student Row */
-        .student-row {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+        .student-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 15px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            transition: transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            gap: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .student-row:hover { transform: translateY(-2px); border-color: var(--primary); }
+        /* Dynamic Border based on Status */
+        .student-card.status-present { border-left: 4px solid var(--present); }
+        .student-card.status-permission { border-left: 4px solid var(--permission); }
+        .student-card.status-absent { border-left: 4px solid var(--absent); }
+
+        .avatar-container {
+            position: relative;
+        }
 
         .avatar {
-            width: 50px; height: 50px;
+            width: 55px; height: 55px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #475569;
+            border: 2px solid var(--surface-hover);
+            background: var(--bg-body);
         }
 
-        .info { flex-grow: 1; }
-        .name { font-weight: 600; font-size: 1.1rem; }
-        .id { font-size: 0.85rem; color: var(--text-gray); }
+        .info { flex-grow: 1; min-width: 0; }
+        .name { font-weight: 600; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .id { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+        .id i { font-size: 0.7rem; }
 
-        /* Attendance Buttons */
-        .actions {
+        /* --- ATTENDANCE TOGGLES --- */
+        .attendance-actions {
             display: flex;
-            gap: 8px;
+            background: var(--bg-body);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .status-btn {
             border: none;
-            padding: 8px 15px;
+            background: transparent;
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            opacity: 0.5;
-            transition: 0.3s;
-            color: #1e293b;
-            font-family: 'Battambang', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
         }
 
-        .btn-p { background-color: var(--success); }
-        .btn-per { background-color: var(--warning); }
-        .btn-a { background-color: var(--danger); }
+        .status-btn:hover { background: rgba(255,255,255,0.05); }
 
-        /* Active State */
-        .status-btn.active {
-            opacity: 1;
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(255,255,255,0.3);
-            color: white;
-        }
+        /* Active States */
+        .status-btn.active-p { background: var(--present); color: #fff; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); }
+        .status-btn.active-per { background: var(--permission); color: #fff; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); }
+        .status-btn.active-a { background: var(--absent); color: #fff; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); }
 
-        /* Floating Submit Button */
-        .submit-container {
+        /* --- BOTTOM BAR --- */
+        .bottom-bar {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 100;
             width: 90%;
             max-width: 800px;
+            z-index: 100;
         }
 
-        .submit-btn {
+        .save-btn {
             width: 100%;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
             transition: 0.3s;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
+            backdrop-filter: blur(4px);
         }
 
-        .submit-btn:hover { background: #2563eb; transform: translateY(-3px); }
-        .submit-btn:disabled { background: #64748b; cursor: wait; }
+        .save-btn:hover { background: #4f46e5; transform: translateY(-2px); }
+        .save-btn:active { transform: translateY(0); }
+        .save-btn:disabled { background: var(--surface-hover); color: var(--text-muted); cursor: not-allowed; box-shadow: none; }
 
         /* Loading */
-        #loading { margin-top: 50px; color: var(--primary); }
+        #loading { margin-top: 100px; display: flex; flex-direction: column; align-items: center; gap: 15px; color: var(--text-muted); }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .student-card { padding: 12px; gap: 12px; }
+            .avatar { width: 45px; height: 45px; }
+            .name { font-size: 0.95rem; }
+            .status-btn { width: 36px; height: 36px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div>
-            <h1>Teacher Portal</h1>
-            <p style="margin:0; font-size:0.9rem; color:#94a3b8;">Record Class Attendance</p>
+        <div class="header-content">
+            <div class="brand">
+                <h1>Class Attendance</h1>
+                <p>Teacher Portal</p>
+            </div>
+            <div class="date-group">
+                <input type="date" id="attendanceDate" class="date-picker">
+            </div>
         </div>
-        <input type="date" id="attendanceDate" class="date-picker">
     </header>
 
-    <div id="loading">Loading Students List...</div>
+    <div id="loading">
+        <div class="spinner"></div>
+        <span>Syncing Class List...</span>
+    </div>
 
-    <div class="attendance-list" id="listContainer"></div>
+    <div class="container" id="listContainer">
+        </div>
 
-    <div class="submit-container">
-        <button id="saveBtn" class="submit-btn" onclick="submitAttendance()">
-            <i class="fas fa-save"></i> Save Attendance (រក្សាទុក)
+    <div class="bottom-bar">
+        <button id="saveBtn" class="save-btn" onclick="submitAttendance()">
+            <i class="fas fa-cloud-upload-alt"></i> Save to Database
         </button>
     </div>
 
     <script>
-        // --- URL CONFIGURATION ---
-        // 1. Link ទិន្នន័យសិស្ស (សម្រាប់អានឈ្មោះមកបង្ហាញ)
+        // --- CONFIGURATION ---
+        // 1. Link សម្រាប់ទាញឈ្មោះសិស្ស
         const STUDENT_INFO_URL = 'https://docs.google.com/spreadsheets/d/19ff8RRIBXj4Qe2NaO04kibrKpGJhzZrJ5iH7Pg66Aps/gviz/tq?tqx=out:csv';
         
-        // 2. SHEETDB API URL (សម្រាប់រក្សាទុកទិន្នន័យ)
-        // TODO: សូមជំនួស xxxxxxxxxxxx ដោយកូដ API របស់អ្នកពី sheetdb.io
+        // 2. SHEETDB API URL
+        // TODO: ជំនួស xxxxxxxxxxxx ដោយកូដរបស់អ្នក
         const SHEETDB_URL = 'https://sheetdb.io/api/v1/0ruy75wda1983'; 
 
         let studentsData = [];
         let attendanceRecord = {}; 
 
-        // Set default date to today
+        // Set Date to Today
         document.getElementById('attendanceDate').valueAsDate = new Date();
 
         async function fetchStudents() {
@@ -205,7 +278,7 @@
                 renderList();
             } catch (error) {
                 console.error(error);
-                document.getElementById('loading').innerText = "Error loading student list.";
+                document.getElementById('loading').innerHTML = '<span style="color:var(--absent)">Failed to load data.</span>';
             }
         }
 
@@ -214,45 +287,68 @@
             container.innerHTML = '';
 
             studentsData.forEach(student => {
-                // Default status is Present (P)
+                // Default Status = Present
                 attendanceRecord[student.ID] = 'Present'; 
 
                 const imgSrc = student.PhotoURL || '';
                 
-                const row = document.createElement('div');
-                row.className = 'student-row';
-                row.innerHTML = `
-                    <img src="${imgSrc}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${student.Name}&background=random'">
+                const card = document.createElement('div');
+                card.className = 'student-card status-present'; // Default class
+                card.id = `card-${student.ID}`;
+                
+                card.innerHTML = `
+                    <div class="avatar-container">
+                        <img src="${imgSrc}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${student.Name}&background=random&color=fff'">
+                    </div>
                     <div class="info">
                         <div class="name">${student.Name}</div>
-                        <div class="id">${student.ID}</div>
+                        <div class="id"><i class="fas fa-id-badge"></i> ${student.ID}</div>
                     </div>
-                    <div class="actions">
-                        <button class="status-btn btn-p active" onclick="setStatus('${student.ID}', 'Present', this)">P</button>
-                        <button class="status-btn btn-per" onclick="setStatus('${student.ID}', 'Permission', this)">Per</button>
-                        <button class="status-btn btn-a" onclick="setStatus('${student.ID}', 'Absent', this)">A</button>
+                    <div class="attendance-actions">
+                        <button class="status-btn active-p" onclick="setStatus('${student.ID}', 'Present', this)" title="Present">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="status-btn" onclick="setStatus('${student.ID}', 'Permission', this)" title="Permission">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button class="status-btn" onclick="setStatus('${student.ID}', 'Absent', this)" title="Absent">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 `;
-                container.appendChild(row);
+                container.appendChild(card);
             });
         }
 
         function setStatus(id, status, btnElement) {
-            // Update Data
+            // 1. Update Data
             attendanceRecord[id] = status;
 
-            // Visual Update (Toggle Active Class)
+            // 2. Update Visuals (Buttons)
             const parent = btnElement.parentElement;
             const buttons = parent.querySelectorAll('.status-btn');
-            buttons.forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
+            
+            // Reset all buttons
+            buttons.forEach(b => {
+                b.className = 'status-btn'; 
+            });
+
+            // Set Active Class based on status
+            if(status === 'Present') btnElement.classList.add('active-p');
+            if(status === 'Permission') btnElement.classList.add('active-per');
+            if(status === 'Absent') btnElement.classList.add('active-a');
+
+            // 3. Update Card Border Color
+            const card = document.getElementById(`card-${id}`);
+            card.className = 'student-card'; // Reset
+            if(status === 'Present') card.classList.add('status-present');
+            if(status === 'Permission') card.classList.add('status-permission');
+            if(status === 'Absent') card.classList.add('status-absent');
         }
 
-        // --- FUNCTION TO SAVE TO SHEETDB ---
         function submitAttendance() {
-            // ការពារករណីមិនទាន់ដាក់ URL
             if (SHEETDB_URL.includes('xxxxxxxxxxxx')) {
-                alert("សូមដាក់ SheetDB API URL របស់អ្នកជាមុនសិន!");
+                alert("សូមដាក់ SheetDB API URL ជាមុនសិន!");
                 return;
             }
 
@@ -260,19 +356,18 @@
             if(!date) { alert("Please select a date!"); return; }
 
             const saveBtn = document.getElementById('saveBtn');
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            const originalContent = saveBtn.innerHTML;
+            
+            saveBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
             saveBtn.disabled = true;
 
-            // រៀបចំទិន្នន័យសម្រាប់បញ្ជូន (Format របស់ SheetDB)
-            // SheetDB ត្រូវការ Array នៃ Object សម្រាប់បញ្ចូលច្រើនជួរព្រមគ្នា
             const dataToSend = studentsData.map(s => ({
                 "Date": date,
-                "Student ID": s.ID,       // ឈ្មោះ Key ត្រូវតែដូច Header ក្នុង Sheet
-                "Student Name": s.Name,   // ឈ្មោះ Key ត្រូវតែដូច Header ក្នុង Sheet
+                "Student ID": s.ID,       
+                "Student Name": s.Name,   
                 "Status": attendanceRecord[s.ID]
             }));
 
-            // បញ្ជូនទៅកាន់ SheetDB
             fetch(SHEETDB_URL, {
                 method: 'POST',
                 headers: {
@@ -283,23 +378,24 @@
             })
             .then(response => response.json())
             .then(data => {
-                // ប្រសិនបើជោគជ័យ SheetDB នឹងឆ្លើយតបមកវិញ
                 if(data.created || data.error === undefined) {
-                    alert("✅ រក្សាទុកបានជោគជ័យ! (Saved to SheetDB)");
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+                    saveBtn.innerHTML = '<i class="fas fa-check-circle"></i> Saved Successfully!';
+                    saveBtn.style.background = 'var(--present)';
                 } else {
-                    throw new Error("SheetDB Error");
+                    throw new Error("API Error");
                 }
                 
                 setTimeout(() => {
-                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance (រក្សាទុក)';
+                    saveBtn.innerHTML = originalContent;
+                    saveBtn.style.background = 'var(--primary)';
                     saveBtn.disabled = false;
-                }, 2000);
+                }, 2500);
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("❌ មានបញ្ហាក្នុងការរក្សាទុក (សូមពិនិត្យមើល URL ឬ Internet)");
-                saveBtn.innerHTML = '<i class="fas fa-save"></i> Retry Save';
+                alert("Connection Failed. Please check internet or API Limit.");
+                saveBtn.innerHTML = '<i class="fas fa-redo"></i> Retry';
+                saveBtn.style.background = 'var(--absent)';
                 saveBtn.disabled = false;
             });
         }
